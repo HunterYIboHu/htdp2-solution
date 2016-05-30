@@ -91,6 +91,7 @@
 ; if ke is "\b", delete a character in front of pos of ed
 ; if ke is "left" or "right", then add/sub 1 to pos of ed
 ; examples:
+; normal example, cursor is in the string.
 (check-expect (edit ed-n " ")
               (make-editor (string-insert (editor-text ed-n)
                                           (editor-pos ed-n)
@@ -107,9 +108,39 @@
               (make-editor (editor-text ed-n) (+ (editor-pos ed-n) 1)))
 (check-expect (edit ed-n "up") ed-n)
 
+; special example, cursor is at the right end of string
+(check-expect (edit ed-l " ")
+              (make-editor (string-insert (editor-text ed-l)
+                                          (editor-pos ed-l)
+                                          " ")
+                           (+ (editor-pos ed-l) 1)))
+(check-expect (edit ed-l "\b")
+              (make-editor (string-delete (editor-text ed-l)
+                                          (editor-pos ed-l))
+                           (- (editor-pos ed-l) 1)))
+(check-expect (edit ed-l "\n") ed-l)
+(check-expect (edit ed-l "left")
+              (make-editor (editor-text ed-l) (- (editor-pos ed-l) 1)))
+(check-expect (edit ed-l "right") ed-l)
+(check-expect (edit ed-l "up") ed-l)
+
+; special example, cursor is at the left end of string
+(check-expect (edit ed-r " ")
+              (make-editor (string-insert (editor-text ed-r)
+                                          (editor-pos ed-r)
+                                          " ")
+                           (+ (editor-pos ed-r) 1)))
+(check-expect (edit ed-r "\b") ed-r)
+(check-expect (edit ed-r "\n") ed-r)
+(check-expect (edit ed-r "left") ed-r)
+(check-expect (edit ed-r "right")
+              (make-editor (editor-text ed-r) (+ (editor-pos ed-r) 1)))
+(check-expect (edit ed-r "up") ed-r)
+
+
 (define (edit ed ke)
   (cond [(= (string-length ke) 1)
-         (cond [(string=? ke "\b")
+         (cond [(and (string=? ke "\b") (< 0 (editor-pos ed)))
                 (make-editor (string-delete (editor-text ed)
                                             (editor-pos ed))
                              (- (editor-pos ed) 1))]
@@ -118,16 +149,26 @@
                 ; use ASCII to predict weather the character is printable character.
                 (make-editor (string-insert (editor-text ed)
                                             (editor-pos ed)
-                                            " ")
+                                            ke)
                              (+ (editor-pos ed) 1))]
                [else ed])]
-        [(string=? "left" ke)
+        [(and (string=? "left" ke) (< 0 (editor-pos ed)))
          (make-editor (editor-text ed)
                       (- (editor-pos ed) 1))]
-        [(string=? "right" ke)
+        [(and (string=? "right" ke) (> (string-length (editor-text ed)) (editor-pos ed)))
          (make-editor (editor-text ed)
                       (+ (editor-pos ed) 1))]
         [else ed]))
+
+
+; String -> launch program
+; comsume a string that represent the initial state of the world
+(define (run text)
+  (big-bang (make-editor text 0)
+            [to-draw render]
+            [on-key edit]))
+
+(run "")
 
 
 
