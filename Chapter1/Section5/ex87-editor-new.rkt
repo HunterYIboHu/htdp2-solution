@@ -21,15 +21,30 @@
 
 
 ; Editor -> Image
+; determine how to display the text.
+; examples:
+(check-expect (text-warp ed-n)
+              (beside (text (substring (editor-text ed-n) 0 (editor-pos ed-n)) SIZE COLOR)
+                      CURSOR
+                      (text (substring (editor-text ed-n) (editor-pos ed-n)) SIZE COLOR)))
+
+(define (text-warp ed)
+  (beside (text (substring (editor-text ed) 0 (editor-pos ed)) SIZE COLOR)
+          CURSOR
+          (text (substring (editor-text ed) (editor-pos ed)) SIZE COLOR)))
+
+
+; Editor -> Image
 ; render the text part of Editor. The text seperate into 2
 ; parts, the left is (substring t 0 p); the right is
 ; (substring t p).
 ; examples:
 (check-expect (render ed-n)
-              (overlay/align "left" "center"
-                             (beside (text (substring (editor-text ed-n) 0 (editor-pos ed-n)) SIZE COLOR)
-                                     CURSOR
-                                     (text (substring (editor-text ed-n) (editor-pos ed-n)) SIZE COLOR))
-                             BKG))
+              (overlay/align "left" "center" (text-warp ed-n) BKG))
+(check-expect (render ed-l)
+              (overlay/align "left" "center" (text-warp ed-l) BKG))
+(check-expect (render ed-r)
+              (overlay/align "left" "center" (text-warp ed-r) BKG))
 
-(define (render ed) ed)
+(define (render ed)
+  (overlay/align "left" "center" (text-warp ed) BKG))
