@@ -11,3 +11,25 @@
 (define ed-l (make-editor "Empty right side."
                           (string-length "Empty right side.")))
 (define ed-r (make-editor "Empty left side." 0))
+
+
+; graphic constants
+(define CURSOR (rectangle 1 20 "solid" "red"))
+(define BKG (empty-scene 200 20))
+(define SIZE 16)
+(define COLOR "black")
+
+
+; Editor -> Image
+; render the text part of Editor. The text seperate into 2
+; parts, the left is (substring t 0 p); the right is
+; (substring t p).
+; examples:
+(check-expect (render ed-n)
+              (overlay/align "left" "center"
+                             (beside (text (substring (editor-text ed-n) 0 (editor-pos ed-n)) SIZE COLOR)
+                                     CURSOR
+                                     (text (substring (editor-text ed-n) (editor-pos ed-n)) SIZE COLOR))
+                             BKG))
+
+(define (render ed) ed)
