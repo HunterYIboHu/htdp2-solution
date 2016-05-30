@@ -1,6 +1,32 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
 #reader(lib "htdp-beginner-reader.ss" "lang")((modname ex87-editor-new) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t write repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp")) #f)))
+; String Position String -> String
+; insert *is* at the *p* of *str*
+; examples:
+(check-expect (string-insert "Hello" 2 "!")
+              (string-append (substring "Hello" 0 2)
+                             "!"
+                             (substring "Hello" 2)))
+
+(define (string-insert str p is)
+  (string-append (substring str 0 p) is (substring str p)))
+
+
+; String Position -> String
+; delete the character in front of the *p* in *str*
+; examples:
+(check-expect (string-delete "Hello" 2)
+              (string-append (substring "Hello" 0 (- 2 1))
+                             (substring "Hello" 2)))
+
+(define (string-delete str p)
+  (string-append (substring str 0 (- p 1))
+                 (substring str p)))
+
+
+; ---String module---
+
 (define-struct editor [text pos])
 ; Editor = (make-editor String Number)
 ; interpretation (make-editor t p) means the text is
@@ -65,6 +91,20 @@
 ; if ke is "\b", delete a character in front of pos of ed
 ; if ke is "left" or "right", then add/sub 1 to pos of ed
 ; examples:
+(check-expect (edit ed-n " ")
+              (make-editor (string-insert (editor-text ed-n)
+                                          (editor-pos ed-n)
+                                          " ")
+                           (+ (editor-pos ed-n) 1)))
+(check-expect (edit ed-n "\b")
+              (make-editor (string-delete (editor-text ed-n)
+                                          (editor-pos ed-n))
+                           (- (editor-pos ed-n) 1)))
+(check-expect (edit ed-n "\n") ed-n)
+(check-expect (edit ed-n "left")
+              (make-editor (editor-text ed-n) (- (editor-pos ed-n) 1)))
+(check-expect (edit ed-n "right")
+              (make-editor (editor-text ed-n) (+ (editor-pos ed-n) 1)))
+(check-expect (edit ed-n "up") ed-n)
 
-
-(define (edit ed ke) ed ke)
+(define (edit ed ke) ed)
