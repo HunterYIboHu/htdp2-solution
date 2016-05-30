@@ -37,6 +37,8 @@
 (define ed-l (make-editor "Empty right side."
                           (string-length "Empty right side.")))
 (define ed-r (make-editor "Empty left side." 0))
+(define long-ed (make-editor "1234567890123456789012"
+                             (string-length "1234567890123456789012")))
 
 
 ; KeyEvents
@@ -83,13 +85,29 @@
   (overlay/align "left" "center" (text-warp ed) BKG))
 
 
+; Editor -> Boolean
+; determine weather a Editor e is to change.
+; If the text is longer than the WIDTH of BKG,
+; then return #f; else return #t.
+; examples：
+(check-expect (normal-text? ed-n) #t)
+(check-expect (normal-text? long-ed) #f)
+
+(define (normal-text? ed)
+  (if (>= (image-width (text-warp (make-editor (string-append (editor-text ed) " ")
+                                               (editor-pos ed))))
+         (image-width BKG))
+      #f
+      #t))
+
+
 ; Editor -> Editor
 ; consume a KeyEvent ke and a Editor ed.
 ; the ke may change the ed
 ; if ke is 1-String exclude "\t" "\r" "\b" etc., insert into
-; the front of pos of ed
-; if ke is "\b", delete a character in front of pos of ed
-; if ke is "left" or "right", then add/sub 1 to pos of ed
+; the front of pos of ed (unless string is longer than the width of BKG)
+; if ke is "\b", delete a character in front of pos of ed (unless pos is 0)
+; if ke is "left" or "right", then add/sub 1 to pos of ed (unless pos is at the relative end)
 ; examples:
 ; normal example, cursor is in the string.
 (check-expect (edit ed-n " ")
@@ -137,6 +155,17 @@
               (make-editor (editor-text ed-r) (+ (editor-pos ed-r) 1)))
 (check-expect (edit ed-r "up") ed-r)
 
+; special example, the string is longer than the width of BKG
+(check-expect (edit long-ed " ") long-ed)
+(check-expect (edit long-ed "\b")
+              (make-editor (string-delete (editor-text long-ed)
+                                          (editor-pos long-ed))
+                           (- (editor-pos long-ed) 1)))
+(check-expect (edit long-ed "\n") long-ed)
+(check-expect (edit long-ed "left")
+              (make-editor (editor-text long-ed) (- (editor-pos long-ed) 1)))
+(check-expect (edit long-ed "right") long-ed)
+(check-expect (edit long-ed "up") long-ed)
 
 (define (edit ed ke)
   (cond [(= (string-length ke) 1)
@@ -144,7 +173,7 @@
                 (make-editor (string-delete (editor-text ed)
                                             (editor-pos ed))
                              (- (editor-pos ed) 1))]
-               [(<= 32 (string->int ke) 126)
+               [(and (<= 32 (string->int ke) 126) (normal-text? ed))
                 ; 使用ASCII码判断是否为可显示字符，然后打印出来
                 ; use ASCII to predict weather the character is printable character.
                 (make-editor (string-insert (editor-text ed)
@@ -169,15 +198,3 @@
             [on-key edit]))
 
 (run "")
-
-
-
-
-
-
-
-
-
-
-
-
