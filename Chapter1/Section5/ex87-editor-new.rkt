@@ -13,6 +13,13 @@
 (define ed-r (make-editor "Empty left side." 0))
 
 
+; KeyEvents
+; - 1-String: insert it into editor-pre
+; - "\b": delete one string in the left of cursor, if any
+; - "left" and "right": move a character from pre to post, vice
+; versa, if any.
+
+
 ; graphic constants
 (define CURSOR (rectangle 1 20 "solid" "red"))
 (define BKG (empty-scene 200 20))
@@ -48,3 +55,16 @@
 
 (define (render ed)
   (overlay/align "left" "center" (text-warp ed) BKG))
+
+
+; Editor -> Editor
+; consume a KeyEvent ke and a Editor ed.
+; the ke may change the ed
+; if ke is 1-String exclude "\t" "\r" "\b" etc., insert into
+; the front of pos of ed
+; if ke is "\b", delete a character in front of pos of ed
+; if ke is "left" or "right", then add/sub 1 to pos of ed
+; examples:
+
+
+(define (edit ed ke) ed ke)
