@@ -107,4 +107,36 @@
               (make-editor (editor-text ed-n) (+ (editor-pos ed-n) 1)))
 (check-expect (edit ed-n "up") ed-n)
 
-(define (edit ed ke) ed)
+(define (edit ed ke)
+  (cond [(= (string-length ke) 1)
+         (cond [(string=? ke "\b")
+                (make-editor (string-delete (editor-text ed)
+                                            (editor-pos ed))
+                             (- (editor-pos ed) 1))]
+               [(<= 32 (string->int ke) 126)
+                ; 使用ASCII码判断是否为可显示字符，然后打印出来
+                ; use ASCII to predict weather the character is printable character.
+                (make-editor (string-insert (editor-text ed)
+                                            (editor-pos ed)
+                                            " ")
+                             (+ (editor-pos ed) 1))]
+               [else ed])]
+        [(string=? "left" ke)
+         (make-editor (editor-text ed)
+                      (- (editor-pos ed) 1))]
+        [(string=? "right" ke)
+         (make-editor (editor-text ed)
+                      (+ (editor-pos ed) 1))]
+        [else ed]))
+
+
+
+
+
+
+
+
+
+
+
+
