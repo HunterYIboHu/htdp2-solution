@@ -1,0 +1,28 @@
+; Movie is (make-movie String String Number)
+; Number is a 4-digit
+(define-struct movie [title producer year])
+
+
+; Person is (make-person String String String String)
+; 1st-stirng is name
+; 2nd-string shall be colors
+; 3rd-string is also colors
+; 4th-string is a String consist of digits
+(defin-struct person [name hair eyes phone])
+
+
+; Pet is (make-pet String Number)
+; String is the name of pet
+; Number is a 3-digit number
+(define-struct pet [name number])
+
+
+; CD is (make-CD String String Number)
+(define-struct CD [artist title price])
+
+
+; Sweater is (make-sweater String String String)
+; 1st-string means the meterial of clothes
+; 2nd-string means the size, like "M", "XXL", etc.
+; 3rd-string means the producer.
+(define-struct sweater [meterial size producer])  
