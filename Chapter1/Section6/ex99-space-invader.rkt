@@ -1,6 +1,6 @@
 ;; The first three lines of this file were inserted by DrRacket. They record metadata
 ;; about the language level of this file in a form that our tools can easily process.
-#reader(lib "htdp-beginner-reader.ss" "lang")((modname 6space-invader) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t write repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp")) #f)))
+#reader(lib "htdp-beginner-reader.ss" "lang")((modname ex99-space-invader) (read-case-sensitive #t) (teachpacks ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp"))) (htdp-settings #(#t write repeating-decimal #f #t none #f ((lib "image.rkt" "teachpack" "2htdp") (lib "universe.rkt" "teachpack" "2htdp")) #f)))
 ; physical constants
 (define WORLD-WIDTH 200)
 (define WORLD-HEIGHT (* 3/4 WORLD-WIDTH))
@@ -16,7 +16,7 @@
 (define LOST-MESSAGE-2 "You lost! Bad news! Expecially you havn't shot it.")
 
 (define TANK-SPEED 3)
-(define UFO-SPEED 8)
+(define UFO-SPEED 4)
 (define MISSLE-SPEED (* 2 UFO-SPEED))
 (define R 5)
 
@@ -67,7 +67,6 @@
 ; - (make-aim UFO Tank)
 ; - (make-fired UFO Tank Missle)
 ; interpretation represents the state of the space invader game
-
 
 
 (define before-fired

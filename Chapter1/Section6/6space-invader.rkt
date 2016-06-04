@@ -7,18 +7,20 @@
 (define MID-WIDTH (/ WORLD-WIDTH 2))
 (define MID-HEIGHT (/ WORLD-HEIGHT 2))
 (define TANK-HEIGHT 8)
+(define MISSILE-START (- WORLD-HEIGHT TANK-HEIGHT 10))
 
-(define FONT-SIZE 36)
+(define FONT-SIZE 12)
 (define WIN-COLOR "olive")
 (define WIN-MESSAGE "You win! Congratulations!")
 (define LOSE-COLOR "red")
 (define LOSE-MESSAGE-1 "You lost! Bad news!")
-(define LOST-MESSAGE-2 "You lost! Bad news! Expecially you havn't shot it.")
+(define LOSE-MESSAGE-2 "You lost! Bad news! Expecially you havn't shot it.")
 
 (define TANK-SPEED 3)
 (define UFO-SPEED 8)
-(define MISSLE-SPEED (* 2 UFO-SPEED))
-(define R 5)
+(define MISSILE-SPEED (* 2 UFO-SPEED))
+(define R 10)
+(define DELTA-X 10)
 
 ; graphical constants
 (define BKG (empty-scene WORLD-WIDTH WORLD-HEIGHT))
@@ -33,6 +35,8 @@
                              (make-posn 5 10))
                        "solid"
                        "blue")))
+(define R-EDGE (- WORLD-WIDTH (/ (image-width UFO) 2)))
+(define L-EDGE (/ (image-width UFO) 2))
 
 
 (define-struct aim [ufo tank])
@@ -69,7 +73,9 @@
 ; interpretation represents the state of the space invader game
 
 
-
+(define start-state
+  (make-aim (make-posn MID-WIDTH 0)
+            (make-tank L-EDGE TANK-SPEED)))
 (define before-fired
   (make-aim (make-posn 20 10)
             (make-tank 28 -3)))
@@ -79,7 +85,7 @@
 (define just-fired
   (make-fired (make-posn 20 10)
               (make-tank 28 -3)
-              (make-posn 28 (- WORLD-HEIGHT TANK-HEIGHT 10))))
+              (make-posn 28 MISSILE-START)))
 (define shotted
   (make-fired (make-posn 20 100)
               (make-tank 100 3)
@@ -88,6 +94,13 @@
   (make-fired (make-posn 20 WORLD-HEIGHT)
               (make-tank 100 3)
               (make-posn 60 45)))
+(define re
+  (make-aim (make-posn 20 100)
+            (make-tank R-EDGE TANK-SPEED)))
+(define le
+  (make-fired (make-posn 20 100)
+              (make-tank L-EDGE TANK-SPEED)
+              (make-posn 20 120)))
 
 ; Tank Image -> Image
 ; adds t to the given image im
@@ -247,10 +260,224 @@
                [else #false])]))
 
 
+; Number -> Number
+; determine weather the height of ufo have reach the end.
+; examples:
+(check-expect (validator-end 10) 10)
+(check-expect (validator-end (+ 10 WORLD-HEIGHT))
+              WORLD-HEIGHT)
+
+(define (validator-end h)
+  (if (> h WORLD-HEIGHT)
+      WORLD-HEIGHT
+      h))
 
 
+; SIGS Number -> SIGS
+; help determine the next SIGS
+; if consume a SIGS, then state must be fired.
+; examples:
+(check-expect (si-move-proper before-fired 100)
+              (make-aim
+               (make-posn 100
+                          (+ (posn-y (aim-ufo before-fired))
+                             UFO-SPEED))
+               (aim-tank before-fired)))
+(check-expect (si-move-proper shotted 100)
+              (make-fired
+               (make-posn 100
+                          (+ (posn-y (fired-ufo shotted))
+                             UFO-SPEED))
+               (fired-tank shotted)
+               (make-posn (posn-x (fired-missile shotted))
+                          (- (posn-y (fired-missile shotted))
+                             MISSILE-SPEED))))
+
+(define (si-move-proper w x)
+  (cond [(aim? w)
+         (make-aim (make-posn x
+                              (+ (posn-y (aim-ufo w))
+                                 UFO-SPEED))
+                   (aim-tank w))]
+        [(fired? w)
+         (make-fired (make-posn x
+                                (+ (posn-y (fired-ufo w))
+                                   UFO-SPEED))
+                     (fired-tank w)
+                     (make-posn (posn-x (fired-missile w))
+                                (- (posn-y (fired-missile w))
+                                   MISSILE-SPEED)))]))
 
 
+; Number -> Number
+; determine weather the ufo's x-coordinate is overflow
+; examples:
+(check-expect (validator -10) L-EDGE)
+(check-expect (validator (+ 10 R-EDGE)) R-EDGE)
+(check-expect (validator 100) 100)
+
+(define (validator x)
+  (cond [(> x R-EDGE) R-EDGE]
+        [(< x L-EDGE) L-EDGE]
+        [else x]))
 
 
+; UFO -> Number
+; create a random number in case a UFO should perform a
+; horizontal jump. the (= (random 2) 1) exp is to
+; determine weather the num is negative.
+; examples:
+(check-random (create-random-number ufo-n)
+              (validator (+ (posn-x ufo-n)
+                            (* (random DELTA-X)
+                               (if (= (random 2) 1) -1 1)))))
+(check-random (create-random-number ufo-e)
+              (validator (+ (posn-x ufo-e)
+                            (* (random DELTA-X)
+                               (if (= (random 2) 1) -1 1)))))
 
+(define (create-random-number u)
+  (validator(+ (posn-x u) (* (random DELTA-X)
+                             (if (= (random 2) 1) -1 1)))))
+
+
+; si-move
+; SIGS -> SIGS
+; determine the next position of UFO and Missile
+; using the velocity of them to compute it.
+; examples:
+(check-random (si-move before-fired)
+              (si-move-proper before-fired
+                              (create-random-number (aim-ufo before-fired))))
+(check-random (si-move just-fired)
+              (si-move-proper just-fired
+                              (create-random-number (fired-ufo just-fired))))
+
+
+(define (si-move w)
+  (si-move-proper w
+                  (create-random-number
+                   (if (aim? w)
+                       (aim-ufo w)
+                       (fired-ufo w)))))
+
+
+; si-control
+; SIGS KeyEvent -> SIGS
+; determine the next SIGS after player press key.
+; if KeyEvent is "left",
+; sub TANK-SPEED pixels to tank's x-coordinate unless to the left end
+; if KeyEvent is "right",
+; add TANK-SPEED pixels to tank's x-coordinate, unless to the right end
+; if KeyEvent is " "(space),
+; fired the Missile, change SIGS to fired.
+; else just ignore it.
+; examples:
+; the state if aim
+(check-expect (si-control before-fired "left")
+              (make-aim (aim-ufo before-fired)
+                        (make-tank (validator
+                                    (- (tank-loc (aim-tank before-fired))
+                                       (tank-vel (aim-tank before-fired))))
+                                   (tank-vel (aim-tank before-fired)))))
+(check-expect (si-control before-fired "right")
+              (make-aim (aim-ufo before-fired)
+                        (make-tank (validator
+                                    (+ (tank-loc (aim-tank before-fired))
+                                       (tank-vel (aim-tank before-fired))))
+                                   (tank-vel (aim-tank before-fired)))))
+(check-expect (si-control before-fired " ")
+              (make-fired (aim-ufo before-fired)
+                          (aim-tank before-fired)
+                          (make-posn (tank-loc (aim-tank before-fired))
+                                     MISSILE-START)))
+(check-expect (si-control before-fired "p") before-fired)
+
+; the state is fired
+(check-expect (si-control just-fired "left")
+              (make-fired (fired-ufo just-fired)
+                          (make-tank (validator
+                                      (- (tank-loc (fired-tank just-fired))
+                                         (tank-vel (fired-tank just-fired))))
+                                     (tank-vel (fired-tank just-fired)))
+                          (fired-missile just-fired)))
+(check-expect (si-control just-fired "right")
+              (make-fired (fired-ufo just-fired)
+                          (make-tank (validator
+                                      (+ (tank-loc (fired-tank just-fired))
+                                         (tank-vel (fired-tank just-fired))))
+                                     (tank-vel (fired-tank just-fired)))
+                          (fired-missile just-fired)))
+(check-expect (si-control just-fired " ") just-fired)
+(check-expect (si-control just-fired "p") just-fired)
+
+; the state is when meet the right end.(state aim)
+(check-expect (si-control re "left")
+              (make-aim (aim-ufo re)
+                        (make-tank (- (tank-loc (aim-tank re))
+                                      (tank-vel (aim-tank re)))
+                                   (tank-vel (aim-tank re)))))
+(check-expect (si-control re "right") re)
+(check-expect (si-control re " ")
+              (make-fired (aim-ufo re)
+                          (aim-tank re)
+                          (make-posn (tank-loc (aim-tank re))
+                                     MISSILE-START)))
+(check-expect (si-control re "p") re)
+
+; special one, the state when meet the left end.(state fired)
+(check-expect (si-control le "left") le)
+(check-expect (si-control le "right")
+              (make-fired (fired-ufo le)
+                          (make-tank (+ (tank-loc (fired-tank le))
+                                        (tank-vel (fired-tank le)))
+                                     (tank-vel (fired-tank le)))
+                          (fired-missile le)))
+(check-expect (si-control le " ") le)
+(check-expect (si-control le "p") le)
+
+(define (si-control w ke)
+  (cond [(aim? w)
+         (cond [(string=? "left" ke)
+                (make-aim (aim-ufo w)
+                          (make-tank (validator (- (tank-loc (aim-tank w))
+                                                   (tank-vel (aim-tank w))))
+                                     (tank-vel (aim-tank w))))]
+               [(string=? "right" ke)
+                (make-aim (aim-ufo w)
+                          (make-tank (validator (+ (tank-loc (aim-tank w))
+                                                   (tank-vel (aim-tank w))))
+                                     (tank-vel (aim-tank w))))]
+               [(string=? " " ke)
+                (make-fired (aim-ufo w)
+                            (aim-tank w)
+                            (make-posn (tank-loc (aim-tank w))
+                                       MISSILE-START))]
+               [else w])]
+        [(fired? w)
+         (cond [(string=? "left" ke)
+                (make-fired (fired-ufo w)
+                            (make-tank (validator (- (tank-loc (fired-tank w))
+                                                     (tank-vel (fired-tank w))))
+                                       (tank-vel (fired-tank w)))
+                            (fired-missile w))]
+               [(string=? "right" ke)
+                (make-fired (fired-ufo w)
+                            (make-tank (validator (+ (tank-loc (fired-tank w))
+                                                     (tank-vel (fired-tank w))))
+                                       (tank-vel (fired-tank w)))
+                            (fired-missile w))]
+               [else w])]))
+
+; SIGS -> SIGS
+; using big-bang to launch the game.
+(define (space-invader w)
+  (big-bang w
+            [on-tick si-move 0.2]
+            [on-key si-control]
+            [to-draw si-render]
+            [stop-when si-game-over?
+                       si-render-final]))
+
+
+(space-invader start-state)
