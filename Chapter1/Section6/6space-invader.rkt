@@ -44,7 +44,7 @@
 
 
 ; A UFO is Posn
-; interpreattion (make-posn x y) is the UFO's current location
+; interpretation (make-posn x y) is the UFO's current location
 ; examples:
 
 (define ufo-n (make-posn 50 50))
