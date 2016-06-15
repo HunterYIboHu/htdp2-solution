@@ -69,8 +69,8 @@
 ; (x, TANK-HEIGHT) and that it moves dx per clock tick
 ; examples:
 
-(define tank-n (make-tank 28 -3))
-(define tank-e (make-tank 90 3))
+(define tank-n (make-tank 28 TANK-SPEED))
+(define tank-e (make-tank 90 TANK-SPEED))
 
 
 (define-struct sigs [ufo tank missile])
@@ -83,17 +83,23 @@
                                (make-tank L-EDGE TANK-SPEED)
                                #false))
 (define lost-b (make-sigs (make-posn 20 WORLD-HEIGHT)
-                          (make-tank 28 -3)
+                          (make-tank 28 TANK-SPEED)
                           #false))
 (define just-fired (make-sigs (make-posn 20 10)
-                              (make-tank 28 -3)
+                              (make-tank 28 TANK-SPEED)
                               (make-posn 28 MISSILE-START)))
 (define lost (make-sigs (make-posn 20 WORLD-HEIGHT)
-                        (make-tank 28 -3)
+                        (make-tank 28 TANK-SPEED)
                         (make-posn 40 20)))
 (define shotted (make-sigs (make-posn 20 100)
-                           (make-tank 100 3)
+                           (make-tank 100 TANK-SPEED)
                            (make-posn 22 103)))
+(define le (make-sigs (make-posn 20 100)
+                      (make-tank L-EDGE TANK-SPEED)
+                      (make-posn 22 103)))
+(define re (make-sigs (make-posn 20 100)
+                      (make-tank R-EDGE TANK-SPEED)
+                      (make-posn 22 103)))
 
 
 ; ufo Image -> Image
@@ -202,6 +208,39 @@
       #false))
 
 
+; si-render-final
+; SIGS.V2 -> Image
+; add the specific message to scene
+; examples:
+(check-expect (si-render-final lost-b)
+              (place-image (text LOSE-MESSAGE-2 FONT-SIZE LOSE-COLOR)
+                           MID-WIDTH MID-HEIGHT
+                           (si-render.v2 lost-b)))
+(check-expect (si-render-final lost)
+              (place-image (text LOSE-MESSAGE-1 FONT-SIZE LOSE-COLOR)
+                           MID-WIDTH MID-HEIGHT
+                           (si-render.v2 lost)))
+(check-expect (si-render-final shotted)
+              (place-image (text WIN-MESSAGE FONT-SIZE WIN-COLOR)
+                           MID-WIDTH MID-HEIGHT
+                           (si-render.v2 shotted)))
+
+(define (si-render-final s)
+  (place-image (text (cond [(>= (posn-y (sigs-ufo s))
+                                WORLD-HEIGHT)
+                            (if (boolean? (sigs-missile s))
+                                LOSE-MESSAGE-2
+                                LOSE-MESSAGE-1)]
+                           [else WIN-MESSAGE])
+                     FONT-SIZE
+                     (if (>= (posn-y (sigs-ufo s))
+                             WORLD-HEIGHT)
+                         LOSE-COLOR
+                         WIN-COLOR))
+               MID-WIDTH MID-HEIGHT
+               (si-render.v2 s)))
+
+
 ; SIGS.V2 -> Boolean
 ; determine whether to end the game.
 ; if the UFO landed, end the game;
@@ -229,18 +268,22 @@
 ; determine the missile's next position
 ; examples:
 (check-expect (si-move-proper start-state 100)
-              (make-sigs (make-ufo 100 (posn-y (sigs-ufo start-state)))
+              (make-sigs (make-posn 100 (+ (posn-y (sigs-ufo start-state))
+                                           UFO-SPEED))
                          (sigs-tank start-state)
                          #f))
 (check-expect (si-move-proper just-fired 20)
-              (make-sigs (make-ufo 20 (posn-y (sigs-ufo just-fired)))
+              (make-sigs (make-posn 20 (+ (posn-y (sigs-ufo just-fired))
+                                          UFO-SPEED))
                          (sigs-tank just-fired)
                          (make-posn (posn-x (sigs-missile just-fired))
                                     (- (posn-y (sigs-missile just-fired))
                                        MISSILE-SPEED))))
 
 (define (si-move-proper s x)
-  (make-sigs (make-ufo x (posn-y (sigs-ufo s)))
+  (make-sigs (make-posn x
+                        (+ (posn-y (sigs-ufo s))
+                           UFO-SPEED))
            (sigs-tank s)
            (if (boolean? (sigs-missile s))
                #f
@@ -249,22 +292,144 @@
                              MISSILE-SPEED)))))
 
 
+; validator
+; Number -> Number
+; if the given num is overflow either end of the world
+; then return the end of the world; else return itself.
+; examples:
+(check-expect (validator 100) 100)
+(check-expect (validator (+ R-EDGE 20)) R-EDGE)
+(check-expect (validator (- L-EDGE 20)) L-EDGE)
+
+(define (validator x)
+  (cond [(>= x R-EDGE) R-EDGE]
+        [(<= x L-EDGE) L-EDGE]
+        [else x]))
+
+
+; create-random-number
+; ufo -> Number
+; determine the random position of ufo
+; use random number to determine the direction,
+; and jump DELTA-X px.
+; if jump over the end, return the end.
+; examples:
+(check-random (create-random-number (sigs-ufo start-state))
+              (validator (+ (posn-x (sigs-ufo start-state))
+                            (* (random DELTA-X)
+                               (if (= (random 2) 1) -1 1)))))
+(check-random (create-random-number (sigs-ufo shotted))
+              (validator (+ (posn-x (sigs-ufo shotted))
+                            (* (random DELTA-X)
+                               (if (= (random 2) 1) -1 1)))))
+
+(define (create-random-number u)
+  (validator (+ (posn-x u) (* (random DELTA-X)
+                              (if (= (random 2) 1) -1 1)))))
+
+
 ; si-move
 ; SIGS.V2 -> SIGS.V2
 ; determine the next position of UFO and MISSILE
 ; examples:
-
+(check-random (si-move start-state)
+              (si-move-proper start-state
+                              (create-random-number (sigs-ufo start-state))))
+(check-random (si-move just-fired)
+              (si-move-proper just-fired
+                              (create-random-number (sigs-ufo just-fired))))
 
 (define (si-move s)
   (si-move-proper s
                   (create-random-number (sigs-ufo s))))
 
 
+; si-control
+; SIGS.V2  KeyEvent -> SIGS.V2
+; if press the key "left", then the tank move left TANK-SPEED px,
+; unless to the left edge;
+; if press the key "right", then the tank move right TANK-SPEED ps,
+; unless to the right edge;
+; if press the key " "(space), then launch the missile.
+; other key don't effect.
+; examples:
+(check-expect (si-control start-state "left") start-state)
+(check-expect (si-control start-state "right")
+              (make-sigs (sigs-ufo start-state)
+                         (make-tank (+ (tank-loc (sigs-tank start-state))
+                                       TANK-SPEED)
+                                    (tank-vel (sigs-tank start-state)))
+                         (sigs-missile start-state)))
+(check-expect (si-control start-state " ")
+              (make-sigs (sigs-ufo start-state)
+                         (sigs-tank start-state)
+                         (make-posn (tank-loc (sigs-tank start-state))
+                                    MISSILE-START)))
+(check-expect (si-control start-state "b") start-state)
+
+(check-expect (si-control just-fired "left")
+              (make-sigs (sigs-ufo just-fired)
+                         (make-tank (- (tank-loc (sigs-tank just-fired))
+                                       TANK-SPEED)
+                                    (tank-vel (sigs-tank just-fired)))
+                         (sigs-missile just-fired)))
+(check-expect (si-control just-fired "right")
+              (make-sigs (sigs-ufo just-fired)
+                         (make-tank (+ (tank-loc (sigs-tank just-fired))
+                                       TANK-SPEED)
+                                    (tank-vel (sigs-tank just-fired)))
+                         (sigs-missile just-fired)))
+(check-expect (si-control just-fired " ") just-fired)
+(check-expect (si-control just-fired "b") just-fired)
+
+(check-expect (si-control le "left") le)
+(check-expect (si-control le "right")
+              (make-sigs (sigs-ufo le)
+                         (make-tank (+ (tank-loc (sigs-tank le))
+                                       TANK-SPEED)
+                                    (tank-vel (sigs-tank le)))
+                         (sigs-missile le)))
+(check-expect (si-control le " ") le)
+(check-expect (si-control le "b") le)
+
+(check-expect (si-control re "left")
+              (make-sigs (sigs-ufo re)
+                         (make-tank (- (tank-loc (sigs-tank re))
+                                       TANK-SPEED)
+                                    (tank-vel (sigs-tank re)))
+                         (sigs-missile re)))
+(check-expect (si-control re "right") re)
+(check-expect (si-control re " ") re)
+(check-expect (si-control re "b") re)
+
+(define (si-control s ke)
+  (make-sigs (sigs-ufo s)
+             (make-tank (cond [(string=? ke "left")
+                               (validator (- (tank-loc (sigs-tank s))
+                                             TANK-SPEED))]
+                              [(string=? ke "right")
+                               (validator (+ (tank-loc (sigs-tank s))
+                                             TANK-SPEED))]
+                              [else (tank-loc (sigs-tank s))])
+                        (tank-vel (sigs-tank s)))
+             (if (and (string=? ke " ")
+                      (boolean? (sigs-missile s)))
+                 (make-posn (tank-loc (sigs-tank s))
+                            MISSILE-START)
+                 (sigs-missile s))))
 
 
+; SIGS.V2 -> SIGS.V2
 
+(define (space-invader s)
+  (big-bang s
+            [on-tick si-move 0.2]
+            [on-key si-control]
+            [to-draw si-render.v2]
+            [stop-when si-gameover?
+                       si-render-final]))
 
-
+(space-invader start-state)
 
 
 
