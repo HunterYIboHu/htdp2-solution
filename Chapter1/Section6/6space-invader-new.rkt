@@ -82,9 +82,15 @@
 (define start-state (make-sigs (make-posn MID-WIDTH 0)
                                (make-tank L-EDGE TANK-SPEED)
                                #false))
+(define lost-b (make-sigs (make-posn 20 WORLD-HEIGHT)
+                          (make-tank 28 -3)
+                          #false))
 (define just-fired (make-sigs (make-posn 20 10)
                               (make-tank 28 -3)
                               (make-posn 28 MISSILE-START)))
+(define lost (make-sigs (make-posn 20 WORLD-HEIGHT)
+                        (make-tank 28 -3)
+                        (make-posn 40 20)))
 (define shotted (make-sigs (make-posn 20 100)
                            (make-tank 100 3)
                            (make-posn 22 103)))
@@ -175,10 +181,83 @@
                                                     BKG))))
 
 
+; in-reach?
+; determine weather the position of two point is less than
+; R.if so, return true; else return false.
+; examples:
+(check-expect (in-reach? (make-posn 3 4)
+                         (make-posn 3 6))
+              #t)
+(check-expect (in-reach? (make-posn 3 10)
+                         (make-posn 3 0))
+              #f)
+
+(define (in-reach? point-a point-b)
+  (if (< (sqrt (+ (sqr (- (posn-x point-a)
+                          (posn-x point-b)))
+                  (sqr (- (posn-y point-a)
+                          (posn-y point-b)))))
+         R)
+      #true
+      #false))
 
 
+; SIGS.V2 -> Boolean
+; determine whether to end the game.
+; if the UFO landed, end the game;
+; if the UFO is shotted, end the game;
+; else continue.
+; examples:
+(check-expect (si-gameover? start-state) #false)
+(check-expect (si-gameover? just-fired) #false)
+(check-expect (si-gameover? shotted) #true)
+(check-expect (si-gameover? lost) #true)
+
+(define (si-gameover? s)
+  (cond [(>= (posn-y (sigs-ufo s))
+             WORLD-HEIGHT)
+         #true]
+        [(and (posn? (sigs-missile s))
+              (in-reach? (sigs-missile s)
+                         (sigs-ufo s)))
+         #true]
+        [else #false]))
 
 
+; si-move-proper
+; SIGS.V2 Number-> SIGS.V2
+; determine the missile's next position
+; examples:
+(check-expect (si-move-proper start-state 100)
+              (make-sigs (make-ufo 100 (posn-y (sigs-ufo start-state)))
+                         (sigs-tank start-state)
+                         #f))
+(check-expect (si-move-proper just-fired 20)
+              (make-sigs (make-ufo 20 (posn-y (sigs-ufo just-fired)))
+                         (sigs-tank just-fired)
+                         (make-posn (posn-x (sigs-missile just-fired))
+                                    (- (posn-y (sigs-missile just-fired))
+                                       MISSILE-SPEED))))
+
+(define (si-move-proper s x)
+  (make-sigs (make-ufo x (posn-y (sigs-ufo s)))
+           (sigs-tank s)
+           (if (boolean? (sigs-missile s))
+               #f
+               (make-posn (posn-x (sigs-missile s))
+                          (- (posn-y (sigs-missile s))
+                             MISSILE-SPEED)))))
+
+
+; si-move
+; SIGS.V2 -> SIGS.V2
+; determine the next position of UFO and MISSILE
+; examples:
+
+
+(define (si-move s)
+  (si-move-proper s
+                  (create-random-number (sigs-ufo s))))
 
 
 
