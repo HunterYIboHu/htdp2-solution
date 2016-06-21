@@ -1,19 +1,14 @@
-# htdp2-solution
+# HtDP2e解题集
 
-这是我的一个整理我的*How to Design Program*的笔记的地方。我现在（2016/6/12）已经完成了练习101，虽然中间有一些列举性的问题没有写。
+本项目的内容是对[*HtDP2e*](http://www.ccs.neu.edu/home/matthias/HtDP2e/index.html)中出现的习题的解答，按照章与节划分源代码归属，并且包含对该节中比较重要或者比较复杂的习题的具体解释。
+本项目的目的有三：
+1. 记录本书习题的答案，巩固学习效果（？！）
+2. 整理组织内容，以供日后查阅
+3. 为*HtDP2e*的使用者提供一个交流答案的地方
 
-如果有人做完了，或者发现我的解答有问题，请跟我联系，比如给个repo之类的。  
+跟平台中其他类似项目（可以通过关键词*htdp2e*搜索）相比，有以下特点（可能的）：
+1. 国际化：有至少中、英两个版本的文档
+2. 结构化：按照章、节划分习题内容——然而代码里面并没有题目的原样
+3. 流程化：commit次数比较多，可以根据commit看清楚设计流程
 
----
-
-5/30/2016更新  
-
-我提交了一个文件ex87，其完全根据设计函数和程序的原则开发，虽然只是一个单行的文本编辑器……如果有人对此感兴趣的话，可以查看提交的历史。
-
----
-
-## English Version
-
-I will store my solution of *How to Design Program 2ed.* here. And now, I have finished Exercise 101, though some exercises which about listing something havn't wrote.
-
-If someone have done all, or just found my solution makes mistake, please give me an issue. Thanks!
+如果对本习题集感兴趣，可以通过邮箱[HunterYiboHu](http://scr.im/3fw5)或者直接在github上联系我们。
