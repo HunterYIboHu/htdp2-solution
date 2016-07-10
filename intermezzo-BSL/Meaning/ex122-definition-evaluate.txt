@@ -1,0 +1,60 @@
+Exercise 123. Suppose the program contains these definitions: 
+
+
+(define (f x y) 
+  (+ (* 3 x) (* y y))) 
+
+Show how DrRacket evaluates the following expressions, step by step: 
+
+
+1.(+ (f 1 2) (f 2 1))
+
+step:
+A. (+ (+ (* 3 1) (* 2 2))
+      (f 2 1))
+B. (+ (+ 3 (* 2 2))
+      (f 2 1))
+C. (+ (+ 3 4)
+      (f 2 1))
+D. (+ 7 (f 2 1))
+E. (+ 7 (+ (* 3 2) (* 1 1)))
+F. (+ 7 (+ 6 (* 1 1)))
+G. (+ 7 (+ 6 1))
+H. (+ 7 7)
+I. 14
+correct!
+
+
+2.(f 1 (* 2 3))
+
+step:
+A. (+ (* 3 1) (* (* 2 3) (* 2 3)))
+B. (+ 3 (* (* 2 3) (* 2 3)))
+C. (+ 3 (* 6 (* 2 3)))
+D. (+ 3 (* 6 6))
+E. (+ 3 36)
+F. 39
+Wrong!!!!!!!!!!!!!!!
+Answer:
+A. (f 1 6)
+B. (+ (* 3 1) (* 6 6))
+C. (+ 3 (* 6 6))
+D. (+ 3 36)
+E. 39
+
+
+3.(f (f 1 (* 2 3)) 19)
+
+step:
+A. (f (f 1 6) 19)
+B. (f (+ (* 3 1) (* 6 6)) 19)
+C. (f (+ 3 (* 6 6)) 19)
+D. (f (+ 3 36) 19)
+E. (f 39 19)
+F. (+ (* 3 39) (* 19 19))
+G. (+ 117 (* 19 19))
+H. (+ 117 361)
+I. 478
+correct!
+
+Use DrRacket’s stepper to confirm your computations. 

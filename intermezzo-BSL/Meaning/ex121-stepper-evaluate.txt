@@ -1,0 +1,50 @@
+Exercise 122. Evaluate the following expressions step by step: 
+
+1.(+ (* (/ 12 8) 2/3) 
+   (- 20 (sqrt 4)))
+
+step:
+A. (+ (* 3/2 2/3)
+    (- 20 (sqrt 4)))
+B. (+ 1
+    (- 20 (sqrt 4)))
+C. (+ 1
+    (- 20 2))
+D. (+ 1 18)
+E. 19
+correct!
+
+2.(cond 
+  [(= 0 0) #false] 
+  [(> 0 1) (string=? "a" "a")] 
+  [else (= (/  1 0) 9)]) 
+
+step:
+A. (cond 
+     [#true #false] 
+     [(> 0 1) (string=? "a" "a")] 
+     [else (= (/  1 0) 9)])
+B. #false
+correct!
+
+3.(cond 
+    [(= 2 0) #false] 
+    [(> 2 1) (string=? "a" "a")] 
+    [else (= (/  1 2) 9)])
+
+step:
+A. (cond 
+     [#false #false] 
+     [(> 2 1) (string=? "a" "a")] 
+     [else (= (/  1 2) 9)])
+B. (cond  
+     [(> 2 1) (string=? "a" "a")] 
+     [else (= (/  1 2) 9)])
+C. (cond  
+     [#true (string=? "a" "a")] 
+     [else (= (/  1 2) 9)])
+D. (string=? "a" "a")
+E. #true
+correct!
+
+Use DrRacket’s stepper to confirm your computations. image
