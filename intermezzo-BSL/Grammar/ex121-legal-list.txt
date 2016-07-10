@@ -1,0 +1,16 @@
+Exercise 121. Discriminate the legal from the illegal sentences in the following list: 
+
+
+1.(x)
+解释：这是一个不合法的符号串。若其是函数调用，则没有参数；若其是变量，则括号后面第一个参数不能是变量，只能是函数或者原语。
+Explain: This is illegal sentences. If this means a function application, there are not parameters; else if this means a variable, the first parameter should not a variable, but a function or a primitive.
+
+2.(+ 1 (not x))
+解释：这是一个合法的符号串，属于表达式。虽然类型上有错误，但是在语义上是合法的。
+Explain: This is a legal sentences, belong to expr. Though there is a error in type, but legal at syntac.
+
+3.(+ 1 2 3)
+解释：这是一个合法的有效的符号串，属于表达式。
+Explain: This is a legal sentences, and it works, belongs to expr.
+
+Explain why the sentences are legal or illegal. Determine whether they belong the category expr or definition.

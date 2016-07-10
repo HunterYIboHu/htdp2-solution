@@ -1,0 +1,13 @@
+Exercise 119. Explain why the following sentences are syntactically legal definitions
+
+1.(define (f x) x)
+解释：包含define函数所需的所有内容：define关键字、函数名、参数名和函数主体的表达式。
+Explain: cover all the keyword 'define' need : define, name of function, name of parameter and expression.
+
+2.(define (f x) y)
+解释：同上，虽然这里的y是在函数外部定义的，但不妨碍其语义上的正确性。
+Explain: same as above one, though y here is defined outside the function main part, but this do not affect the correct in syntac.
+
+3.(define (f x y) 3)
+解释：同上，这里的参数虽然没有用上，但是数字3可以作为表达式而存在。
+Explain: same as above one, though the parameter do not appear at main part of function, but the number '3' can exist as a expression.

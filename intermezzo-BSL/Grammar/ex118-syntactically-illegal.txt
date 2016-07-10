@@ -1,0 +1,14 @@
+Exercise 118. Explain why the following sentences are syntactically illegal
+1.(3 + 4)
+Explain: primitive should in the first position, like '(+ 3 4)'
+
+2.number?
+Explain: don't use brackets to include it, and don't have function parameters.
+
+3.(l)
+Explain: 1 is a number, but the first position of brackets is for primitive or function.
+
+4.(x)
+Explain: if x is a variable, then mistake is same as above one;
+else if x is a function, it still need some parameter.
+

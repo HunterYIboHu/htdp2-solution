@@ -1,0 +1,13 @@
+Exercise 120. Explain why the following sentences are syntactically illegal
+
+1.(define (f "x") x)
+解释：在定义函数的时候传入的是字符串而不是作为占位符的参数名。
+Explain: Which used in define function is not a parameter name but a string "x"。
+
+2.(define (f x y z) (x))
+解释：函数主体不是一个表达式。
+Explain: the main part of function is not a experssion.
+
+3.(define (f) 10)
+解释：函数名后面没有接参数名。
+Explain: There is no parameter name behind the name of function. 

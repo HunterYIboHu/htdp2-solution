@@ -1,0 +1,10 @@
+Exercise 117. Explain why the following sentences are syntactically legal expressions
+1.x
+Explain: x represent the variable, is not one of the keywords.
+
+2.(= y z)
+Explain: '=' is a pre-defined function, can be the first parameter;
+and y, z means the function parameter can be the variable.
+
+3.(= (= y z) 0)
+Explain: like the one above, but the parameter of outside function '=' is the result of expression '(= y z)'
