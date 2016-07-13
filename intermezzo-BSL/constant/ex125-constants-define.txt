@@ -1,0 +1,52 @@
+Exercise 125. Evaluate the following program, step by step: 
+
+
+(define PRICE 5) 
+(define SALES-TAX (* 0.08 PRICE)) 
+(define TOTAL (+ PRICE SALES-TAX))
+
+Answer:
+
+A. (define SALES-TAX (* 0.08 5))
+B. (define SALES-TAX 0.4)
+C. (define TOTAL (+ 5 SALES-TAX))
+D. (define TOTAL (+ 5 0.4))
+E. (define TOTAL 5.4)
+
+Does the evaluation of the following program signal an error? 
+
+
+(define COLD-F 32) 
+(define COLD-C (fahrenheit->celsius COLD-F)) 
+(define (fahrenheit->celsius f) 
+ (* 5/9 (- f 32))) 
+
+Answer:
+
+是的！函数fahrenheit->celsius的调用先于其定义。
+
+Yes! The application of function named "fahrenheit->celsius" is before the definition of function. 
+
+How about the next one? 
+
+
+(define LEFT -100) 
+(define RIGHT 100) 
+(define (f x) (+ (* 5 (expt x 2)) 10)) 
+(define f@LEFT (f LEFT)) 
+(define f@RIGHT (f RIGHT)) 
+
+Answer:
+
+A. (define f@LEFT (f -100))
+B. (define f@LEFT (+ (* 5 (expt -100 2)) 10))
+C. (define f@LEFT (+ (* 5 10000) 10))
+D. (define f@LEFT (+ 50000 10))
+E. (define f@LEFT 50010)
+F. (define f@RIGHT (f 100))
+G. (define f@RIGHT (+ (* 5 (expt 100 2)) 10))
+H. (define f@RIGHT (+ (* 5 10000) 10))
+I. (define f@RIGHT (+ 50000 10))
+J. (define f@RIGHT 50010)
+
+Check your computations with DrRacket’s stepper.
