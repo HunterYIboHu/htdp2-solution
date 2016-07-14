@@ -1,0 +1,24 @@
+Exercise 126. Pick the legal from the legal from illegal sentences in the following list: 
+
+
+1.(define-struct oops [])
+
+Answer:
+Legal sentence. It's not necessary to have values' name in parentheses.
+句子合法。括号内不需要有变量名。
+
+
+2.(define-struct child [parents dob date])
+
+Answer:
+Legal sentence. The define-struct followed by a single variable name and a sequence of variables in parentheses.
+句子合法。关键词define-struct跟着单个变量名以及一个在括号内的变量序列。
+
+
+3.(define-struct (child person) [dob date])
+
+Answer:
+Illegal sentence. The define-struct not followed by a single variable name, but a parenthese with two variables.
+
+
+Explain why the sentences are legal or illegal. 

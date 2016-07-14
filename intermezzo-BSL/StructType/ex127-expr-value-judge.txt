@@ -1,0 +1,15 @@
+Exercise 127. Identify which of the following expressions are values: 
+
+
+1.(make-point 1 2 3)
+
+
+2.(make-point (make-point 1 2 3) 4 5)
+
+
+3.(make-point (+ 1 2) 3 4)
+
+
+Explain why the expressions are values or not.
+
+Answer: all the expr are values.

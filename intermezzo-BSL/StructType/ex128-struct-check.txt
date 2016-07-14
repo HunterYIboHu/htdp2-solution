@@ -1,0 +1,27 @@
+Exercise 128. Suppose the program contains 
+```
+(define-struct ball [x y speed-x speed-y])
+```
+Predict the results of evaluating the following expression: 
+
+1.(number? (make-ball 1 2 3 4))
+
+Answer: #false
+
+2.(ball-speed-y (make-ball (+ 1 2) (+ 3 3) 2 3))
+
+Answer: 3
+
+3.(ball-y (make-ball (+ 1 2) (+ 3 3) 2 3))
+
+Answer: 6 
+
+4.(ball-x (make-posn 1 2))
+
+Answer: Error
+
+5.(ball-speed-y 5)
+
+Answer: Error
+
+Check your predictions in DrRacket’s interactions area. Use the stepper to see how DrRacket produces this result.
