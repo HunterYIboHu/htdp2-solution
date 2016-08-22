@@ -1,0 +1,13 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-beginner-abbr-reader.ss" "lang")((modname ex149-compare-data-define) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+; Exercise 149. Compare the function definitions from this section
+; (sum, how-many, all-true, one-true) with
+; the corresponding function definitions from the preceding sections.
+; Is it better to work with data definitions that accommodate empty lists
+; as opposed to definitions for non-empty lists? Why? Why not?
+
+
+; Answer:
+; It's better to define the non-empty lists. For the real data shall not
+; be empty, the way to proceed empty list can be a big trouble.

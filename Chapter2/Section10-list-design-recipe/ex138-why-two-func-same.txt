@@ -1,0 +1,4 @@
+Compare the template for how-many and contains-flatt?. Ignoring the function name, they are the same. Explain why.
+
+Answer:
+the function body and header is nearly the same, you just need to replace several variable or struct names, and then transfer one function to the other.
