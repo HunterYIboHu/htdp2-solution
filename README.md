@@ -15,3 +15,9 @@
 3. 流程化：commit次数比较多，可以根据commit看清楚设计流程
 
 如果对本习题集感兴趣，可以通过邮箱[HunterYiboHu](http://scr.im/3fw5)或者直接在github上联系我们。
+
+---
+
+运行环境：
+Win10 Home 64bit
+racekt v6.5
