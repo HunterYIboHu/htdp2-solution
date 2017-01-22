@@ -1,0 +1,25 @@
+;; The first three lines of this file were inserted by DrRacket. They record metadata
+;; about the language level of this file in a form that our tools can easily process.
+#reader(lib "htdp-intermediate-reader.ss" "lang")((modname ex257-build-lst) (read-case-sensitive #t) (teachpacks ()) (htdp-settings #(#t constructor repeating-decimal #f #t none #f () #f)))
+; [X] N [N -> X] -> [List-of X]
+; constructs a list by applying f to 0, 1, ..., (sub1 n)
+; (build-l*st n f) == (list (f 0) ... (f (sub1 n)))
+
+(check-expect (build-l*st 5 add1) '(1 2 3 4 5))
+(check-expect (build-l*st 5 sqr) '(0 1 4 9 16))
+
+(define (build-l*st n f)
+  (cond [(= n 0) '()]
+        [else (add-at-end (f (sub1 n))
+                          (build-l*st (sub1 n) f))]))
+
+
+;; auxiliary functions
+; X [List-of X] -> [List-of X]
+; add the given X to the end of the given list.
+
+(check-expect (add-at-end 10 '(1 2 3)) '(1 2 3 10))
+(check-expect (add-at-end 10 '()) '(10))
+
+(define (add-at-end x l)
+  (append l `(,x)))
