@@ -1,0 +1,5 @@
+<machine initial="black">
+	<action state="black" next="white" />
+	<action state="white" next="black" next-2="blue" />
+	<order afirst="1" csecond="2" bthird="3" />
+</machine>

@@ -1,0 +1,4 @@
+<machine initial="black">
+	<action state="black" next="white" />
+	<action state="white" next="black" />
+</machine>
