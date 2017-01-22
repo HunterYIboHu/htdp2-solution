@@ -212,8 +212,8 @@
 (check-expect (hit-the-wall? (make-posn 100 490)) #true)
 
 (define (hit-the-wall? head)
-  (not (and (<= MOVE (posn-x head) (- WIDTH MOVE))
-            (<= MOVE (posn-y head) (- HEIGHT MOVE)))))
+  (not (and (< MOVE (posn-x head) (- WIDTH MOVE))
+            (< MOVE (posn-y head) (- HEIGHT MOVE)))))
 
 
 ; Worm -> Worm
